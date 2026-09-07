@@ -1,0 +1,68 @@
+---
+title: "TOLENTINO, CHARLES STEPHEN BENEDICT R.-FA3"
+author: "Charles Stephen Benedict R. Tolentino"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+# =======================================================
+# Problem 5: Overall Percentage of Relevant Images (Law of Total Probability)
+# =======================================================
+
+# Define the percentage of images supplied by each sensor (Prior probabilities)
+P_Sensor <- c(0.15, 0.20, 0.25, 0.40)
+
+# Define the percentage of relevant images given each sensor (Conditional probabilities)
+P_Relevant_given_Sensor <- c(0.50, 0.60, 0.80, 0.85)
+
+# Calculate the overall probability of a relevant image (Total Probability)
+P_Relevant_total <- sum(P_Sensor * P_Relevant_given_Sensor)
+
+# Convert to percentage
+overall_percentage <- P_Relevant_total * 100
+
+cat("--- Problem 5 Result ---\n")
+cat("The overall percentage of relevant images is:", overall_percentage, "%\n\n")
+
+
+# =======================================================
+# Problem 6: Pairwise vs. Mutual Independence of Coin Tosses
+# =======================================================
+
+# Define the sample space for tossing a fair coin twice
+sample_space <- c("HH", "HT", "TH", "TT")
+P_each <- 1 / length(sample_space) # Each outcome has a 1/4 probability
+
+# Define the events as logical vectors over the sample space
+E1 <- sample_space %in% c("HH", "TT")
+E2 <- sample_space %in% c("HH", "HT")
+E3 <- sample_space %in% c("TH", "HH")
+
+# Compute individual probabilities
+P_E1 <- sum(E1 * P_each)
+P_E2 <- sum(E2 * P_each)
+P_E3 <- sum(E3 * P_each)
+
+# Compute intersection probabilities
+P_E1_and_E2 <- sum((E1 & E2) * P_each)
+P_E1_and_E3 <- sum((E1 & E3) * P_each)
+P_E2_and_E3 <- sum((E2 & E3) * P_each)
+P_E1_E2_E3  <- sum((E1 & E2 & E3) * P_each)
+
+cat("--- Problem 6 Verification ---\n")
+
+# Check Pairwise Independence: P(A ∩ B) == P(A) * P(B)
+cat("1. Pairwise Independence Checks:\n")
+cat("   P(E1 ∩ E2) =", P_E1_and_E2, "| P(E1) * P(E2) =", P_E1 * P_E2, 
+    "-> Independent?", P_E1_and_E2 == (P_E1 * P_E2), "\n")
+cat("   P(E1 ∩ E3) =", P_E1_and_E3, "| P(E1) * P(E3) =", P_E1 * P_E3, 
+    "-> Independent?", P_E1_and_E3 == (P_E1 * P_E3), "\n")
+cat("   P(E2 ∩ E3) =", P_E2_and_E3, "| P(E2) * P(E3) =", P_E2 * P_E3, 
+    "-> Independent?", P_E2_and_E3 == (P_E2 * P_E3), "\n\n")
+
+# Check Mutual Independence: P(E1 ∩ E2 ∩ E3) == P(E1) * P(E2) * P(E3)
+cat("2. Mutual Independence Check:\n")
+cat("   P(E1 ∩ E2 ∩ E3) =", P_E1_E2_E3, "| P(E1) * P(E2) * P(E3) =", P_E1 * P_E2 * P_E3, 
+    "-> Mutually Independent?", P_E1_E2_E3 == (P_E1 * P_E2 * P_E3), "\n")
+```

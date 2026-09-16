@@ -1,0 +1,160 @@
+---
+title: "APM1110_FA5_Tolentino_Charles"
+author: "Charles Stephen Benedict R. Tolentino"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+# ================================
+# 1. Discrete Random Variables
+# ================================
+
+# (a) Value of constant k
+
+# The weights are (2x = 1) for x = 1, 2, 3, 4
+
+# Formula: sum(P(X = x)) = 1
+#          sum(k * (2x + 1)) = 1 => k = 1 / sum(2x + 1)
+
+x <- 1:4 
+weight <- 2 * x + 1
+k <- 1 / sum(weight)
+
+# Define probability mass function
+probability <- k * weight
+
+cat("(a) The value of constant k is :", round(k, 4), "\n")
+
+
+# (b) Expected value E[X] and Variance Var(X)
+
+# Formula: E[X] = sum(x * P(X = x))
+expected_value <- sum(x * probability)
+
+# Formula: Var(X) = sum((x - E[X])^2 * P(X = x))
+variance <- sum((x - expected_value)^2 * probability)
+
+cat("(b) Expected value E[X]:", round(expected_value, 4), "\n")
+cat("    Variance Var(X):", round(variance, 4), "\n")
+
+
+# (c) Probability P(X >= 3)
+
+# Formula: P(X >= 3) = P(X = 3) + P(X = 4)
+probability_greater_than_3 <- sum(probability[x >= 3 ])
+
+cat("(c) P(X >= 3):", round(probability_greater_than_3, 4), "\n\n")
+
+# ================================
+# 2. Binomial Distribution
+# ================================
+
+# Define sample size and probability of error
+n <- 20
+p <- 0.08
+
+# (a) Probability that exactly 2 requests are malicious
+
+# Formula: P(X = x) = choose(n, x) * p^x * (1 - p)^(n - x)
+# R built-in: dbinom(x, n, p)
+probability_exactly_2 <- dbinom(2, size = n, prob = p)
+
+cat("(a) The probability that exactly 2 requests are malicious is:", round(probability_exactly_2, 4), "\n")
+
+
+# (b) Probability that exactly 3 requests are malicious
+
+# Formula: P(X >= 3) = 1 - P(X<= 2) = 1 - sum(P(X = x) for x from 0 to 2)
+# R built-in: pbinom(2, n, p, lower.tail = FALSE)
+probability_at_least_3 <- pbinom(2, size = n, prob = p, lower.tail = FALSE)
+
+cat("(b) The probability that exactly 3 requests are malicious is:", round(probability_at_least_3, 4), "\n")
+
+
+# (c) Mean and standard deviation
+
+# Mean Formula: mu = n * p
+binom_mean <- n * p
+
+# Standard deviation formula: sigma = sqrt(n * p * (1 - p))
+binom_sd <- sqrt(n * p * (1 - p))
+
+cat("(c) Mean:", round(binom_mean, 4), "\n")
+cat("    Standard deviaion:", round(binom_sd, 4), "\n")
+
+
+
+# ================================
+# 3. Poisson Distribution
+# ================================
+
+# Define base rate lambda per minute
+lambda_main <- 4.5
+
+# (a) Probability of receiving exactly 6 hits in a minute
+
+# Formula: P(X = x) = (lambda^x * e^(-lambda)) / x!
+# R built-in: dpois(x, lambda)
+p_exact_6 <- dpois(6, lambda = lambda_main)
+
+cat("(a) The probability of receiving exactly 6 hits in a minute is:", round(p_exact_6, 4), "\n")
+
+
+# (b) Probability of receiving at most 2 hits in a minute
+
+# Formula: P(X <= 2) = P(X = 0) + P(X = 1) P(X = 2)
+# R built-in: ppois(x, lambda)
+p_at_most_2 <- ppois(2, lambda = lambda_main)
+
+cat("(b) The probability of receiving at most 2 hits in a minute is:", round(p_at_most_2, 4), "\n")
+
+
+# (c) Probability of receiving more than 10 hits in 2 minutes
+
+# Adjust lambda for 2 minutes, lambda_main = 4.5 * 2 
+
+# Formula: P(Y > 10) = 1 - P(Y <= 10)
+# R built-in: ppois(x, lambda, lower.tail = FALSE)
+lambda_2min <- lambda_main * 2 
+
+p_more_than_10 <- ppois(10, lambda = lambda_2min, lower.tail = FALSE)
+
+cat("(c) The probability of receiving more than 10 hits in 2 minutes is:", round(p_more_than_10, 4), "\n\n")
+
+
+
+# ===================================================
+# 4. Continous Probability & Normal Distribution
+# ===================================================
+
+# Define mean and standard deviation
+mu <- 120
+sigma <- 15
+
+# (a) Proportion of queries longer than 135 milliseconds
+
+# Formula: P(X > 135) = P(Z > (135 - mu) / sigma)
+# R built-in: pnorm(q, mean, sd, lower.tail = FALSE)
+p_longer_than_135 <- pnorm(135, mean = mu, sd = sigma, lower.tail = FALSE)
+
+cat("(a) The proportion of queries longer than 135 milliseconds is:", round(p_longer_than_135, 4), "\n")
+
+
+# (b) Probability of a random chosen query between 100 and 130 milliseconds
+
+# Formula: P(100 <= X <= 130) - P(X <= 100)
+# R built-in: pnorm(q2, mean, sd) - pnorm(q1, mean, sd)
+p_between_100_and_130 <- pnorm(130, mean = mu, sd = sigma) - pnorm(100, mean = mu, sd = sigma)
+
+cat("(b) The probability of a random chosen query between 100 and 130 milliseconds is:", round(p_between_100_and_130, 4), "\n")
+
+
+# (c) Calculate the 95th percentile of query processing times
+
+# Formula: P(X <= x) = 0.95 => x = mu + (Z_0.95 * sigma) 
+# R built-in: qnorm(p, mean, sd)
+percentile_95 <- qnorm(0.95, mean = mu, sd = sigma)
+
+cat("(c) The 95th percentile of the processing times is:", round(percentile_95, 4), "\n")
+```

@@ -1,0 +1,160 @@
+---
+title: "FA7_Group_5"
+author: "Charles Stephen Benedict R. Tolentino"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+# Part 1: Exponential Distribution
+
+# Load dataset into code
+data <- read.csv("data.csv")
+idling_time <- data[, 2]
+# Calculate core parameters
+exponential_mean <- mean(idling_time)
+cat("Exponential Mean: ", exponential_mean)
+
+lambda <- 1 / exponential_mean
+cat("Lambda: ", lambda)
+
+# PDF parameters on peak spikes and volatility at x = 2
+x <- 2
+pdf_at_2 <- dexp(x, rate = lambda)
+cat("PDF at x = 2: ", pdf_at_2)
+
+pdf_mean <- dexp(exponential_mean, rate = lambda)
+cat("PDF at mean: ", pdf_mean)
+
+pdf <- pdf_at_2 / pdf_mean
+cat("Congestion factor at peak traffic: ", pdf)
+
+
+# PDF Analysis: Evaluating the Probability Density Function (PDF) at x = 2 to simulate a scenario where students come in more frequent and bigger batches as opposed to the experiment's spry 8 second arrival rate. When the yielded PDF value of 0.09790 is compared to set mean of 0.04631, the likelihood of a 2 second arrival interval becomes 2.1 times more likely to happen. This provides well-documented proof of "pack behavior" on campus: students do not and rarely pass throughsecurity checks in a homogenized, evenly-spaced stream. Instead, traffic travels in dense, rapid-fire clusters especially during peak hours. When these peak spikes hit, the guards are subjected to a wave of back-to-back arrivals that carries twice the baseline gate arrivals of usual campus traffic.
+
+
+# CDF parameters on line congestion and line accumulation during peak hours 
+y <- 2
+cdf <- pexp(x, rate = lambda)
+cat("Probability of line congestion at peak hours: ", cdf)
+
+line_congestion_per_second <- 1 / 2
+cat("Number of students arriving at security gate per second: ", line_congestion_per_second)
+
+line_congestion <- line_congestion_per_second * 60
+cat("Number of students arriving at security gate per minute: ", line_congestion)
+
+# CDF Analysis: Using the Cumulative Distribution Function (CDF) to isolate the exact threshold where the security check start to congest during peak arrival hours, we find a 22.27% probability that consecutive student arrivals occur within 2 seconds or less. Because each security guard takes an average of 4 seconds to inspect a bag, the security checks operate at its absolute maximum capacity threshold at precisely 2 seconds. Therefore, this CDF metric proves that nearly one-quarter (22.27%) of all incoming student traffic arrives at a rate that saturate the security check gates at certain hours of the day leaving the system vulnerable to immediate queue building at a rate of 0.50 students per second lost.
+
+
+
+# Findings: 
+
+# Scenario: Campus Security Gate Foot Traffic at main perimeter entrance. This study models student arrival gaps using an Exponential Distribution to evaluate how effectively a two-guard team handles real-world student arrivals.
+
+# Data Collection Process: Ground observations were simulated and recorded tracking 50 consecutive student entries during a standard mid-morning window (9:00 AM – 10:30 AM). Using a stopwatch split-timer, the researcher logged the exact time gap (in seconds) between consecutive student arrivals at the security gate face. Total elapsed tracking time was 397 seconds.
+
+# Computed Parameters:
+	# Sample Size: 50 students
+	# Sample Mean: 7.94 seconds between arrivals
+	# Rate Parameter: 0.12594 arrivals per second
+
+# Interpretations and Real-World Implications: 
+    # PDF Analysis: Evaluating the PDF reveals that a rapid-fire 2-second arrival gap during peak hours has a density of 0.09790, making it 2.115 times more likely to happen than an arrival at the 7.94-second mean. This mathematically proves campus "pack behavior" (students clump in groups).
+
+    # CDF Analysis: The CDF shows a 22.27% probability that students arrive within 2 seconds or less. Because two guards can process a maximum combined capacity of 1 student every 2 seconds, nearly one-quarter of all traffic saturates the gate during peak hours.
+
+    # Queue Spillover: At this 2-second saturation point, any gate complication or second lost causes the line to immediately compound at a net rate of 0.50 students per second, adding 1 student every 2 seconds. A minor 30-second stall could generate 15 students onto the line.
+
+
+# Graphing
+# Create base density histogram using raw data
+hist(idling_time, prob = TRUE, breaks = 12,
+     main = "Observed Gaps vs. Fitted Exponential Curve",
+     xlab = "Arrival Gaps (Seconds)", ylab = "Probability Density",
+     col = "lightgray", border = "darkgray", xlim = c(0,30), ylim = c(0, 0.14))
+
+# Generate points for exponential curve
+x_seq <- seq(0, 30, by = 0.1)
+y_curve <- dexp(x_seq, rate = lambda)
+lines(x_seq, y_curve, col = "blue", lwd = 2.5)
+
+# Shade PDF from 0 to 2 seconds
+x_shade <- seq(0, 2, by = 0.01)
+y_shade <- dexp(x_shade, rate = lambda)
+polygon(c(0, x_shade, 2), c(0, y_shade, 0),
+        col = rgb(1, 0, 0, alpha = 0.3), border = NA)
+
+# Add legend and annotations
+abline(v = exponential_mean, col = "darkgreen", lty = 2, lwd = 1.5)
+points(2, dexp(2, rate = lambda), col = "red", pch = 19, cex = 1.5)
+legend("topright", 
+       legend = c("Observed Data", "Exponential PDF", "System Mean", "0-2s Overload Zone"),
+       col = c("lightgray", "blue", "darkgreen", rgb(1, 0, 0, alpha = 0.3)), 
+       lty = c(1, 1, 2, NA), 
+       lwd = c(8, 2.5, 1.5, NA), 
+       pch = c(NA, NA, NA, 15), 
+       pt.cex = c(1, 1, 1, 2))
+text(2.5, dexp(2, rate = lambda) + 0.01, labels = "x = 2s Limit", col = "darkred", font = 2)
+text(exponential_mean + 2.5, 0.12, labels = paste("Mean =", round(exponential_mean, 2), "s"), col = "darkgreen")
+```
+
+```{r}
+# Part 2: Normal Distributions
+
+# Load data into code
+data_2 <- read.csv("data.csv")
+inspection_time <- data_2[, 3]
+
+# Calculate core parameters
+normal_mean <- mean(inspection_time)
+stdev <- sd(inspection_time)
+
+# Construct frequency distribution table
+inspection_table <- data.frame(
+  "Inspection Duration" = c(3, 4, 5, 6, 7, 8, 9, 10),
+  "Frequency" = c(7, 12, 3, 10, 6, 5, 5, 2),
+  check.names = FALSE
+)
+
+total_n <- sum(inspection_table[["Frequency"]])
+
+inspection_table[["Relative Frequency"]] <- inspection_table[["Frequency"]] / total_n
+inspection_table[["Cumulative Frequency"]] <- cumsum(inspection_table[["Frequency"]])
+inspection_table[["Cumulative Relative Frequency"]] <- cumsum(inspection_table[["Relative Frequency"]])
+
+knitr::kable(inspection_table, format = "markdown")
+
+# Create normal distribution curve
+duration  <- c(3, 4, 5, 6, 7, 8, 9, 10)
+frequency <- c(7, 12, 3, 10, 6, 5, 5, 2)
+raw_data  <- rep(duration, times = frequency)
+total_n   <- sum(frequency)
+bin_width <- 1
+x_values <- seq(min(duration) - 1, max(duration) + 1, length.out = 200)
+y_counts <- dnorm(x_values, mean = normal_mean, sd = stdev) * total_n * bin_width
+plot(
+  x_values, y_counts, 
+  type = "l", 
+  lwd = 3, 
+  col = "darkblue",
+  main = "Frequency vs Inspection Duration",
+  xlab = "Inspection Duration", 
+  ylab = "Frequency",
+  ylim = c(0, max(frequency) + 2), 
+  las = 1
+)
+
+# Percent data within 1, 2, and 3 standard deviations from the mean
+pct_stdev <- sum(raw_data >= (normal_mean - 1 * stdev) & raw_data <= (normal_mean + 1 * stdev)) / total_n * 100
+cat("Percent data within 1 standard deviation: ", pct_stdev)
+
+pct_stdev_2 <- sum(raw_data >= (normal_mean - 2 * stdev) & raw_data <= (normal_mean + 2 * stdev)) / total_n * 100
+cat("Percent data within 2 standard deviation: ", pct_stdev_2)
+
+pct_stdev_3 <- sum(raw_data >= (normal_mean - 3 * stdev) & raw_data <= (normal_mean + 3 * stdev)) / total_n * 100
+cat("Percent data within 3 standard deviation: ", pct_stdev_3)
+
+
+# Findings: Security checks follow a normal distribution centered at an average (μ) of 5.82 seconds. While the Cumulative Distribution Function (CDF) shows 64% of students clear quickly in 6 seconds or less (with 38% taking 4 seconds or less), a heavy right tail isolates a 36% risk zone where bag complications delay inspections to 7–10 seconds. Because the two-guard gate has a combined average capacity of one student every 2.91 seconds, when peak hours hit the gates it runs an operational deficit against students arriving at said gates. When a guard gets trapped in the 10-second slow zone, the gate degrades to a single lane and capacity is halved. Facing 2-second arrival bursts at this reduced speed forces a net queue growth of 0.50 students per second, meaning a single 10-second stall cause a 5 student long line. 
+```
